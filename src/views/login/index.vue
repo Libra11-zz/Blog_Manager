@@ -12,15 +12,15 @@
         <h3 class="title">Login Form</h3>
       </div>
 
-      <el-form-item prop="username">
+      <el-form-item prop="userName">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
         <el-input
-          ref="username"
-          v-model="loginForm.username"
+          ref="userName"
+          v-model="loginForm.userName"
           placeholder="Username"
-          name="username"
+          name="userName"
           type="text"
           tabindex="1"
           autocomplete="on"
@@ -83,11 +83,11 @@ export default {
     }
     return {
       loginForm: {
-        username: 'Libra',
+        userName: 'Libra',
         password: 'lixin521'
       },
       loginRules: {
-        username: [
+        userName: [
           { required: true, trigger: 'blur', validator: validateUsername }
         ],
         password: [
@@ -118,8 +118,8 @@ export default {
     // window.addEventListener('storage', this.afterQRScan)
   },
   mounted() {
-    if (this.loginForm.username === '') {
-      this.$refs.username.focus()
+    if (this.loginForm.userName === '') {
+      this.$refs.userName.focus()
     } else if (this.loginForm.password === '') {
       this.$refs.password.focus()
     }
@@ -155,7 +155,8 @@ export default {
               })
               this.loading = false
             })
-            .catch(() => {
+            .catch(err => {
+              console.log(err)
               this.loading = false
             })
         } else {

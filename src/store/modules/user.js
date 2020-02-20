@@ -18,7 +18,7 @@ const mutations = {
     state.introduction = introduction
   },
   SET_NAME: (state, name) => {
-    state.name = name
+    state.userName = name
   },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
@@ -31,12 +31,12 @@ const mutations = {
 const actions = {
   // user login
   login({ commit }, userInfo) {
-    const { username, password } = userInfo
+    const { userName, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
-        const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
+      login({ userName: userName.trim(), password: password }).then(response => {
+        const { token } = response
+        commit('SET_TOKEN', token)
+        setToken(token)
         resolve()
       }).catch(error => {
         reject(error)
@@ -48,24 +48,25 @@ const actions = {
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
       getInfo(state.token).then(response => {
-        const { data } = response
+        const { info } = response
 
-        if (!data) {
+        if (!info) {
           reject('Verification failed, please Login again.')
         }
 
-        const { roles, name, avatar, introduction } = data
-
+        const { isAdmin, userName } = info
+        const roles = isAdmin ? ['Admin'] : ['Other']
         // roles must be a non-empty array
         if (!roles || roles.length <= 0) {
           reject('getInfo: roles must be a non-null array!')
         }
 
-        commit('SET_ROLES', roles)
-        commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
-        commit('SET_INTRODUCTION', introduction)
-        resolve(data)
+        commit('SET_ROLES')
+        commit('SET_NAME', userName)
+        resolve({
+          roles,
+          userName
+        })
       }).catch(error => {
         reject(error)
       })
@@ -75,7 +76,7 @@ const actions = {
   // user logout
   logout({ commit, state, dispatch }) {
     return new Promise((resolve, reject) => {
-      logout(state.token).then(() => {
+      logout().then(() => {
         commit('SET_TOKEN', '')
         commit('SET_ROLES', [])
         removeToken()
