@@ -83,8 +83,8 @@ export default {
     }
     return {
       loginForm: {
-        userName: 'Libra',
-        password: 'lixin521'
+        userName: '',
+        password: ''
       },
       loginRules: {
         userName: [
