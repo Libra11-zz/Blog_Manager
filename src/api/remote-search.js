@@ -1,13 +1,13 @@
 import request from '@/utils/request'
 
-export function searchUser(name) {
+export function searchUser() {
   return request({
-    url: '/vue-element-admin/search/user',
-    method: 'get',
-    params: { name }
+    url: '/api/remote-search/getAllAdminUsers',
+    method: 'get'
   })
 }
 
+// Unuse
 export function transactionList(query) {
   return request({
     url: '/vue-element-admin/transaction/list',

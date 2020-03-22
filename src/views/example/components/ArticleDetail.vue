@@ -8,7 +8,6 @@
           type="success"
           @click="submitForm"
         >Publish</el-button>
-        <el-button v-loading="loading" type="warning" @click="draftForm">Draft</el-button>
       </sticky>
 
       <div class="createPost-main-container">
@@ -110,7 +109,6 @@ import { fetchArticle } from '@/api/article'
 import { searchUser } from '@/api/remote-search'
 
 const defaultForm = {
-  status: 'draft',
   title: '', // 文章题目
   content: '', // 文章内容
   content_short: '', // 文章摘要
@@ -269,8 +267,10 @@ export default {
       })
       this.postForm.status = 'draft'
     },
-    getRemoteUserList(query) {
-      searchUser(query).then(response => {
+    getRemoteUserList() {
+      console.log('调用了。。。')
+      searchUser().then(response => {
+        console.log(`-----${response}------`)
         if (!response.data.items) return
         this.userListOptions = response.data.items.map(v => v.name)
       })

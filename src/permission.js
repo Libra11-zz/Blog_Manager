@@ -1,4 +1,4 @@
-import router from './router'
+import router, { resetRouter } from '@/router'
 import store from './store'
 import { Message } from 'element-ui'
 import NProgress from 'nprogress' // progress bar
@@ -36,6 +36,7 @@ router.beforeEach(async(to, from, next) => {
           // generate accessible routes map based on roles
           const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
           // dynamically add accessible routes
+          resetRouter()
           router.addRoutes(accessRoutes)
           next()
         } catch (error) {
