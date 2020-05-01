@@ -101,6 +101,7 @@
 <script>
 import MDinput from '@/components/MDinput'
 import { searchUser } from '@/api/remote-search'
+import { addBlogs } from '@/api/blogs'
 import MarkdownEditor from '@/components/MarkdownEditor'
 
 const defaultForm = {
@@ -110,8 +111,8 @@ const defaultForm = {
   category: '',
   content_short: '', // 文章摘要
   image_uri: '', // 文章图片
-  pubTime: '',
-  upTime: ''
+  pubTime: new Date().getTime(),
+  upTime: new Date().getTime()
 }
 export default {
   name: 'ArticleDetail',
@@ -142,18 +143,6 @@ export default {
   computed: {
     contentShortLength() {
       return this.postForm.content_short.length
-    },
-    displayTime: {
-      // set and get is useful when the data
-      // returned by the back end api is different from the front end
-      // back end return => "2013-06-25 06:59:25"
-      // front end need timestamp => 1372114765000
-      get() {
-        return +new Date(this.postForm.display_time)
-      },
-      set(val) {
-        this.postForm.display_time = new Date(val)
-      }
     }
   },
   created() {
@@ -168,6 +157,9 @@ export default {
       this.$refs.postForm.validate(valid => {
         if (valid) {
           this.loading = true
+          addBlogs(this.postForm).then(response => {
+            console.log(response)
+          })
           this.$notify({
             title: '成功',
             message: '发布文章成功',
