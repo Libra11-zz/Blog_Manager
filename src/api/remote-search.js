@@ -6,6 +6,12 @@ export function searchUser() {
     method: 'get'
   })
 }
+export function searchTag() {
+  return request({
+    url: '/api/remote-search/getAllTags',
+    method: 'get'
+  })
+}
 
 // Unuse
 export function transactionList(query) {

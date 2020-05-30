@@ -48,7 +48,19 @@
                     prop="tag"
                     class="postInfo-container-item"
                   >
-                    <el-input v-model="postForm.tag" placeholder="Please input tag" />
+                    <!-- <el-input v-model="postForm.tag" placeholder="Please input tag" /> -->
+                    <el-select
+                      v-model="postForm.tag"
+                      multiple
+                      filterable
+                      allow-create
+                      default-first-option
+                      remote
+                      :remote-method="getRemoteTagList()"
+                      placeholder="请选择文章标签"
+                    >
+                      <el-option v-for="item in tagOptions" :key="item" :label="item" :value="item" />
+                    </el-select>
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
@@ -100,14 +112,14 @@
 
 <script>
 import MDinput from '@/components/MDinput'
-import { searchUser } from '@/api/remote-search'
+import { searchUser, searchTag } from '@/api/remote-search'
 import { addBlogs } from '@/api/blogs'
 import MarkdownEditor from '@/components/MarkdownEditor'
 
 const defaultForm = {
   title: '', // 文章题目
   content: '', // 文章内容
-  tag: '',
+  tag: [],
   category: '',
   content_short: '', // 文章摘要
   image_uri: '', // 文章图片
@@ -129,6 +141,7 @@ export default {
       postForm: Object.assign({}, defaultForm),
       loading: false,
       userListOptions: [],
+      tagOptions: [],
       rules: {
         image_uri: [{ validator: validateRequire }],
         title: [{ validator: validateRequire }],
@@ -178,6 +191,12 @@ export default {
         console.log(response)
         if (!response.info.length) return
         this.userListOptions = response.info.map(v => v.userName)
+      })
+    },
+    getRemoteTagList() {
+      searchTag().then(response => {
+        if (!response.info.length) return
+        this.tagOptions = response.info
       })
     }
   }
