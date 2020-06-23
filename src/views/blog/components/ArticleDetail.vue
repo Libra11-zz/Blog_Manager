@@ -55,11 +55,15 @@
                       filterable
                       allow-create
                       default-first-option
-                      remote
-                      :remote-method="getRemoteTagList()"
                       placeholder="请选择文章标签"
+                      @focus="getRemoteTagList"
                     >
-                      <el-option v-for="item in tagOptions" :key="item" :label="item" :value="item" />
+                      <el-option
+                        v-for="item in tagOptions"
+                        :key="item"
+                        :label="item"
+                        :value="item"
+                      />
                     </el-select>
                   </el-form-item>
                 </el-col>
@@ -70,7 +74,28 @@
                     prop="category"
                     class="postInfo-container-item"
                   >
-                    <el-input v-model="postForm.category" placeholder="Please input category" />
+                    <!-- <el-select
+                      v-model="postForm.category"
+                      multiple
+                      filterable
+                      allow-create
+                      default-first-option
+                      @focus="getRemoteCategoryList"
+                      placeholder="请选择文章分类"
+                    >
+                      <el-option
+                        v-for="item in categoryOptions"
+                        :key="item"
+                        :label="item"
+                        :value="item"
+                      />
+                    </el-select>-->
+                    <el-autocomplete
+                      v-model="postForm.category"
+                      class="inline-input"
+                      :fetch-suggestions="querySearch"
+                      placeholder="请选择文章分类"
+                    />
                   </el-form-item>
                 </el-col>
               </el-row>
@@ -112,7 +137,7 @@
 
 <script>
 import MDinput from '@/components/MDinput'
-import { searchUser, searchTag } from '@/api/remote-search'
+import { searchUser, searchTag, searchCategory } from '@/api/remote-search'
 import { addBlogs } from '@/api/blogs'
 import MarkdownEditor from '@/components/MarkdownEditor'
 
@@ -142,6 +167,7 @@ export default {
       loading: false,
       userListOptions: [],
       tagOptions: [],
+      categoryOptions: [],
       rules: {
         image_uri: [{ validator: validateRequire }],
         title: [{ validator: validateRequire }],
@@ -158,6 +184,9 @@ export default {
       return this.postForm.content_short.length
     }
   },
+  mounted() {
+    this.getRemoteCategoryList()
+  },
   created() {
     // Why need to make a copy of this.$route here?
     // Because if you enter this page and quickly switch tag, may be in the execution of the setTagsViewTitle function, this.$route is no longer pointing to the current page
@@ -165,8 +194,24 @@ export default {
     this.tempRoute = Object.assign({}, this.$route)
   },
   methods: {
+    querySearch(queryString, cb) {
+      var categoryOptions = this.categoryOptions
+      var results = queryString
+        ? categoryOptions.filter(this.createFilter(queryString))
+        : categoryOptions
+      // 调用 callback 返回建议列表的数据
+      cb(results)
+    },
+    createFilter(queryString) {
+      return categoryOptions => {
+        return (
+          categoryOptions.value
+            .toLowerCase()
+            .indexOf(queryString.toLowerCase()) === 0
+        )
+      }
+    },
     submitForm() {
-      console.log(this.postForm)
       this.$refs.postForm.validate(valid => {
         if (valid) {
           this.loading = true
@@ -197,6 +242,22 @@ export default {
       searchTag().then(response => {
         if (!response.info.length) return
         this.tagOptions = response.info
+      })
+    },
+    getRemoteCategoryList() {
+      const _this = this
+      searchCategory().then(response => {
+        if (!response.info.length) return
+        // this.categoryOptions = response.info;
+        const res = []
+        response.info.forEach(element => {
+          if (!res.includes(element)) {
+            res.push({
+              value: element
+            })
+          }
+        })
+        _this.categoryOptions = res
       })
     }
   }

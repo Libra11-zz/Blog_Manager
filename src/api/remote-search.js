@@ -12,6 +12,12 @@ export function searchTag() {
     method: 'get'
   })
 }
+export function searchCategory() {
+  return request({
+    url: '/api/remote-search/searchCategory',
+    method: 'get'
+  })
+}
 
 // Unuse
 export function transactionList(query) {
